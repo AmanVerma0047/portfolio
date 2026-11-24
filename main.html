@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aman's Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        /* * {
+            font-family: Roboto Mono;
+            line-height: 1.4;
+            margin-right: 0px;
+            padding: 0px;
+        }
+
+        .links {
+            color: rgb(0, 140, 255);
+        } */
+        body {
+            margin: 0;
+        }
+
+        .editor {
+            display: flex;
+            width: 100%;
+            height: 100dvh;
+            box-sizing: border-box;
+        }
+
+        #code:focus {
+            outline: none;
+        }
+
+        .editor:focus-within {
+            outline: 1px solid #888;
+            outline-offset: -1px;
+        }
+
+        #code {
+            flex: 1;
+            min-width: 0;
+
+            cursor: text;
+            /* I-beam when hovering */
+            caret-color: #258beb;
+            /* Blue blinking caret */
+            caret-shape: block;
+        }
+
+
+
+        .editor>* {
+            box-sizing: border-box;
+            margin: 0;
+            font: 18px/30px system-ui, sans-serif;
+        }
+
+        #line-numbers {
+            flex: 0 0 auto;
+            min-width: calc(2ch + 12px);
+            padding: 4px 4px 4px 8px;
+            overflow: hidden;
+            white-space: pre;
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+            color: #808080;
+            user-select: none;
+        }
+
+        #code {
+            font-family:roboto mono ;
+            flex: 1;
+            min-width: 0;
+            padding: 4px 8px 4px 0;
+            border: 0;
+            background: transparent;
+            resize: none;
+            overflow: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- <p>
+        <span style="color: grey;">1</span>
+        AMAN VERMA
+    </p>
+    <p style="color: grey;">
+        <span style="color: grey;">2</span>
+        I love writing Apps, UI, and functional applications.I
+        love tinkering with different Technologies.
+    </p>
+    <hr style="border: none; border-top: 2px dotted grey; width: 100%;">
+    <p> Email * Resume * LinkedIn</p> -->
+    <div class="editor">
+        <div id="line-numbers" aria-hidden="true">1</div>
+        <textarea id="code" aria-label="Code editor" wrap="off" spellcheck="false">
+AMAN VERMA
+<p>I love writing Apps, UI, and functional applications.I love tinkering with different Technologies.</p>
+Email * Resume * LinkedIn
+        </textarea>
+    </div>
+
+
+    <script>
+        const textarea = document.querySelector('#code');
+        const gutter = document.querySelector('#line-numbers');
+
+        function syncScroll() {
+            gutter.scrollTop = textarea.scrollTop;
+        }
+
+        function updateLineNumbers() {
+            const count = textarea.value.split('\n').length;
+            gutter.textContent = Array.from({ length: count }, (_, i) => i + 1).join('\n');
+            syncScroll();
+        }
+
+        textarea.addEventListener('input', updateLineNumbers);
+        textarea.addEventListener('scroll', syncScroll);
+        updateLineNumbers();
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aman's Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Balsamiq+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0px;
+            padding: 0px;
+        }
+
+        * {
+            font-family: Balsamiq Sans;
+            line-height: 1;
+
+            padding: 0px;
+        }
+
+        .links {
+            color: rgb(0, 140, 255);
+        }
+
+        #custom-caret {
+            animation: caret-blink 1s step-end infinite;
+            color: rgb(0, 140, 255);
+        }
+
+        @keyframes caret-blink {
+            50% {
+                opacity: 0;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            #custom-caret {
+                animation: none;
+            }
+        }
+
+        .text {
+            color: grey;
+        }
+
+        #bottom-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            margin: 0;
+            /* Remove the default <p> margin */
+            line-height: 25px;
+
+            /* Center the text vertically */
+                display: flex;
+                align-items: center;
+                gap: 8px;
+        }
+
+        .portfolio {
+            padding-bottom: 25px;
+            /* Keep the last row clear of the bar */
+        }
+
+        ::selection {
+            background-color: rgb(0, 140, 255);
+            color: white;
+        }
+
+        .bar-status {
+            margin-inline-start: auto;
+            color: #85ceeb;
+        }
+    </style>
+</head>
+
+<body>
+    <p>
+        <span style="color: grey;">1</span>
+        <b>&nbsp;&nbsp;AMAN VERMA</b>
+    </p>
+
+    <p style="color: grey;">
+        <span style="color: grey;">2</span>
+        &nbsp;&nbsp;I love writing Apps, UI, and functional applications.I
+        love tinkering with different Technologies.<span id="custom-caret">█</span>
+    </p>
+
+    <p><span class="text">3</span>&nbsp;&nbsp;Technologies:-</p>
+    <p class="text">&nbsp;&nbsp;&nbsp;&nbsp;>Godot Development</p>
+    <p class="text">&nbsp;&nbsp;&nbsp;&nbsp;>Android Applications </p>
+    <p class="text">&nbsp;&nbsp;&nbsp;&nbsp;>Web Development </p>
+    <p class="text">&nbsp;&nbsp;&nbsp;&nbsp;>Blender </p>
+    <p class="text">&nbsp;&nbsp;&nbsp;&nbsp;>UI/UX Design</p>
+    <p class="text">&nbsp;&nbsp;&nbsp;&nbsp;>System Design</p>
+    <p><span class="text">4</span>&nbsp;&nbsp;Tools I Use:-</p>
+    <p style="color: grey;">
+        <span style="color: grey;">5</span>&nbsp;&nbsp;Mainly an Open Source Guy. I use Emacs as Code editor. I use
+        python mostly. I use Html/CSS/JS mainly for frontend. Sometimes I use React.js For faster web
+        applications.Flutter and godot for mobile app projects.I use Git and Github for version control.
+    </p>
+    <hr style="border: none; border-top: 2px dotted grey; width: 100%;">
+    <p>&nbsp;<a href="vaman0183@gmail.com" class="links">Email</a> * <a href="" class="links">Resume</a> * <a
+            href="https://www.linkedin.com/in/aman-verma-a22765380/" class="links">LinkedIn</a> * <a
+            href="https://github.com/AmanVerma0047" class="links">Github</a> * <a
+            href="https://kirisoft.pages.dev/" class="links">Blog</a></p>
+    <p id="bottom-bar" style="background-color:#335ea8; color: white;"> <span
+            style="color:#85ceeb;">&nbsp;-\**</span>Portfolio.html<span class="bar-status"> UTF-8
+            CRLF {}html&nbsp;&nbsp;</span>
+    </p>
+
+</body>
+
+</html>
