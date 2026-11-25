@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
         rel="stylesheet">
+    <link href="mononoki-Regular.ttf" rel="stylesheet">
 
     <style>
         /* * {
@@ -21,6 +22,21 @@
         .links {
             color: rgb(0, 140, 255);
         } */
+
+        @font-face {
+            font-family: "Mononoki";
+            src: url("./mononoki-Regular.ttf") format("truetype");
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        .editor>* {
+            box-sizing: border-box;
+            margin: 0;
+            font: 400 18px/30px "Mononoki", monospace;
+        }
+
         body {
             margin: 0;
         }
@@ -52,14 +68,6 @@
             caret-shape: block;
         }
 
-
-
-        .editor>* {
-            box-sizing: border-box;
-            margin: 0;
-            font: 18px/30px system-ui, sans-serif;
-        }
-
         #line-numbers {
             flex: 0 0 auto;
             min-width: calc(2ch + 12px);
@@ -73,7 +81,6 @@
         }
 
         #code {
-            font-family:roboto mono ;
             flex: 1;
             min-width: 0;
             padding: 4px 8px 4px 0;
@@ -81,6 +88,36 @@
             background: transparent;
             resize: none;
             overflow: auto;
+        }
+
+        #bottom-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            margin: 0;
+            /* Remove the default <p> margin */
+            line-height: 25px;
+
+            /* Center the text vertically */
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .portfolio {
+            padding-bottom: 25px;
+            /* Keep the last row clear of the bar */
+        }
+
+        ::selection {
+            background-color: rgb(0, 140, 255);
+            color: white;
+        }
+
+        .bar-status {
+            margin-inline-start: auto;
+            color: #85ceeb;
         }
     </style>
 </head>
@@ -100,12 +137,36 @@
     <div class="editor">
         <div id="line-numbers" aria-hidden="true">1</div>
         <textarea id="code" aria-label="Code editor" wrap="off" spellcheck="false">
-AMAN VERMA
-<p>I love writing Apps, UI, and functional applications.I love tinkering with different Technologies.</p>
-Email * Resume * LinkedIn
+Aman Verma
+I love writing Apps, UI, and functional applications.I love tinkering with different Technologies.
+
+Technologies:-
+
+>Godot Development
+>Android Applications
+>Web Development
+>Blender
+>UI/UX Design
+>System Design
+
+Tools I use:-
+
+Mainly an Open Source Guy. I use Emacs as Code editor. I use python mostly. I use Html/CSS/JS mainly for frontend. Sometimes I use React.js For faster web applications.Flutter and godot for mobile app projects.I use Git and Github for version control.
+
+Contact Me:-
+
+[Email]("vaman0183@gmail.com")
+[Github]("https://github.com/amanverma0047")
+[Blog]("https://kirisoft.pages.dev/")
+[LinkedIn]("https://linkedIn.com/amanverma0047")
+
+
         </textarea>
     </div>
-
+    <p id="bottom-bar" style="background-color:#335ea8; color: white;font-family: mononoki;"> <span
+            style="color:#85ceeb;">&nbsp;-\**</span>Portfolio.html<span class="bar-status"> UTF-8
+            CRLF {}html&nbsp;&nbsp;</span>
+    </p>
 
     <script>
         const textarea = document.querySelector('#code');

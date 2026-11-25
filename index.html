@@ -5,115 +5,426 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aman's Portfolio</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Balsamiq+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap"
-        rel="stylesheet">
 
     <style>
-        body {
-            margin: 0px;
-            padding: 0px;
+        @font-face {
+            font-family: "Mononoki";
+            src: url("./mononoki-Regular.ttf") format("truetype");
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
         }
 
-        * {
-            font-family: Balsamiq Sans;
-            line-height: 1;
+        :root {
+            /* Emacs faces */
+            --bg: #ffffff;
+            --fg: #1c1c1c;
+            --line-number: #8a8a8a;
+            --blockquote: #1c7a1c;     /* markdown-blockquote-face */
+            --link-text: #2b7bb9;      /* markdown-link-face */
+            --link-url: #52627f;       /* markdown-url-face (italic) */
+            --cursor: #1e90ff;
+            --modeline-bg: #2f5ba8;
+            --modeline-fg: #ffffff;
+            --selection: #1e90ff;
 
-            padding: 0px;
+            --font-size: 18px;
+            --line-height: 1.15;
+            --mode-h: 20px;
         }
 
-        .links {
-            color: rgb(0, 140, 255);
-        }
+        * { box-sizing: border-box; }
 
-        #custom-caret {
-            animation: caret-blink 1s step-end infinite;
-            color: rgb(0, 140, 255);
-        }
-
-        @keyframes caret-blink {
-            50% {
-                opacity: 0;
-            }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            #custom-caret {
-                animation: none;
-            }
-        }
-
-        .text {
-            color: grey;
-        }
-
-        #bottom-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
+        html, body {
             margin: 0;
-            /* Remove the default <p> margin */
-            line-height: 25px;
-
-            /* Center the text vertically */
-                display: flex;
-                align-items: center;
-                gap: 8px;
+            height: 100%;
+            background: var(--bg);
+            overflow: hidden;
         }
 
-        .portfolio {
-            padding-bottom: 25px;
-            /* Keep the last row clear of the bar */
+        body {
+            color: var(--fg);
+            font: 400 var(--font-size)/var(--line-height) "Mononoki", monospace;
         }
 
-        ::selection {
-            background-color: rgb(0, 140, 255);
-            color: white;
+        ::selection { background: var(--selection); color: #fff; }
+
+
+        /* ---------- buffer ---------- */
+        #buffer {
+            height: calc(100dvh - var(--mode-h));
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 4px 0 0;
+            outline: none;
+            cursor: text;
+            scrollbar-width: thin;
         }
 
-        .bar-status {
-            margin-inline-start: auto;
-            color: #85ceeb;
+        .row { display: flex; }
+
+        .ln {
+            flex: 0 0 auto;
+            width: calc(2ch + 24px);
+            padding: 0 1ch 0 0;
+            margin-left: 0;
+            text-align: right;
+            color: var(--line-number);
+            font-variant-numeric: tabular-nums;
+            user-select: none;
         }
+
+        .tx {
+            flex: 1;
+            min-width: 0;
+            padding-right: 14px;
+            white-space: pre-wrap;
+            overflow-wrap: break-word;
+            padding-left: 0;
+        }
+
+        .tx::after { content: "\200b"; }
+
+        .bq   { color: var(--blockquote); }
+        .lt   { color: var(--link-text); }
+        .lu   { color: var(--link-url); font-style: italic; }
+        a     { color: inherit; text-decoration: none; }
+        a:hover .lt, a:hover .lu { text-decoration: underline; }
+
+        /* ---------- block cursor ---------- */
+        .cursor {
+            background: var(--cursor);
+            color: #fff;
+            animation: blink 1s steps(1) infinite;
+        }
+        body.blurred .cursor {
+            background: transparent;
+            color: inherit;
+            outline: 1px solid var(--cursor);
+            outline-offset: -1px;
+            animation: none;
+        }
+        body.typing .cursor { animation: none; }
+        @keyframes blink { 50% { background: transparent; color: inherit; } }
+
+        /* ---------- mode line ---------- */
+        #modeline {
+            position: fixed;
+            left: 0; right: 0; bottom: 0;
+            height: var(--mode-h);
+            display: flex;
+            align-items: center;
+            gap: 2ch;
+            padding: 0 4px;
+            font-size: 14px;
+            line-height: 1;
+            background: var(--modeline-bg);
+            color: var(--modeline-fg);
+            white-space: pre;
+            user-select: none;
+        }
+        .ticker {
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+            -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+            mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+        }
+        .ticker-track {
+            display: inline-flex;
+            white-space: pre;
+            animation: scroll 22s linear infinite;
+        }
+        .ticker-track span { padding-right: 3ch; }
+        .ticker:hover .ticker-track { animation-play-state: paused; }
+        @keyframes scroll { to { transform: translateX(-50%); } }
+        @media (prefers-reduced-motion: reduce) { .ticker-track { animation: none; } }
+
+        /* hidden input that captures typing, paste & mobile keyboards */
+        #sink {
+            position: fixed; left: 0; top: 0;
+            width: 1px; height: 1px;
+            opacity: 0; border: 0; padding: 0;
+            resize: none; pointer-events: none;
+            font-size: 16px;
+        }
+
+        #modeline b { font-weight: 700; -webkit-text-stroke: 0.4px currentColor; }
     </style>
 </head>
 
 <body>
-    <p>
-        <span style="color: grey;">1</span>
-        <b>&nbsp;&nbsp;AMAN VERMA</b>
-    </p>
+    <div id="buffer" tabindex="0" aria-label="Portfolio.md"></div>
 
-    <p style="color: grey;">
-        <span style="color: grey;">2</span>
-        &nbsp;&nbsp;I love writing Apps, UI, and functional applications.I
-        love tinkering with different Technologies.<span id="custom-caret">█</span>
-    </p>
+    <textarea id="sink" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false" aria-label="Editor input"></textarea>
 
-    <p><span class="text">3</span>&nbsp;&nbsp;Technologies:-</p>
-    <p class="text">&nbsp;&nbsp;&nbsp;&nbsp;>Godot Development</p>
-    <p class="text">&nbsp;&nbsp;&nbsp;&nbsp;>Android Applications </p>
-    <p class="text">&nbsp;&nbsp;&nbsp;&nbsp;>Web Development </p>
-    <p class="text">&nbsp;&nbsp;&nbsp;&nbsp;>Blender </p>
-    <p class="text">&nbsp;&nbsp;&nbsp;&nbsp;>UI/UX Design</p>
-    <p class="text">&nbsp;&nbsp;&nbsp;&nbsp;>System Design</p>
-    <p><span class="text">4</span>&nbsp;&nbsp;Tools I Use:-</p>
-    <p style="color: grey;">&nbsp;&nbsp;&nbsp;&nbsp;>Mainly an Open Source Guy. I use Emacs as Code editor. I use
-        python mostly. I use Html/CSS/JS mainly for frontend. Sometimes I use React.js For faster web
-        applications.Flutter and godot for mobile app projects.I use Git and Github for version control.
-    </p>
-    <hr style="border: none; border-top: 2px dotted grey; width: 100%;">
-    <p>&nbsp;<a href="vaman0183@gmail.com" class="links">Email</a> * <a href="" class="links">Resume</a> * <a
-            href="https://www.linkedin.com/in/aman-verma-a22765380/" class="links">LinkedIn</a> * <a
-            href="https://github.com/AmanVerma0047" class="links">Github</a> * <a
-            href="https://kirisoft.pages.dev/" class="links">Blog</a></p>
-    <p id="bottom-bar" style="background-color:#335ea8; color: white;"> <span
-            style="color:#85ceeb;">&nbsp;-\**</span>Portfolio.html<span class="bar-status"> UTF-8
-            CRLF {}html&nbsp;&nbsp;</span>
-    </p>
+    <div id="modeline">
+        <span id="st">1\---</span>
+        <b>about.md</b>
+        <span id="pos">All L1</span>
+        <div class="ticker" aria-hidden="true">
+            <div class="ticker-track">
+                <span>* Welcome to my portfolio * Godot * Android * Web * Blender * UI/UX * System Design *</span>
+                <span>* Welcome to my portfolio * Godot * Android * Web * Blender * UI/UX * System Design *</span>
+            </div>
+        </div>
+        <span>(Markdown +2 ElDoc)</span>
+    </div>
 
+    <script>
+        /* The buffer contents (what you'd have in about.md) */
+        const TEXT = `Aman Verma
+I love writing Apps, UI, and functional applications.I love tinkering with different Technologies.
+
+Technologies:-
+
+>Godot Development
+>Android Applications
+>Web Development
+>Blender
+>UI/UX Design
+>System Design
+
+Tools I use:-
+
+Mainly an Open Source Guy. I use Emacs as Code editor. I use python mostly. I use Html/CSS/JS mainly for frontend. Sometimes I use React.js For faster web applications.Flutter and godot for mobile app projects.I use Git and Github for version control.
+
+Contact Me:-
+
+[Email]("vaman0183@gmail.com")
+[Github]("https://github.com/amanverma0047")
+[Blog]("https://kirisoft.pages.dev/")
+[LinkedIn]("https://linkedIn.com/amanverma0047")
+
+`;
+
+        const lines = TEXT.split('\n');
+        const buffer = document.getElementById('buffer');
+        const posEl = document.getElementById('pos');
+        let cl = 0, cc = 0; // cursor line / column
+
+        /* ---- "font-lock": turn a line into styled segments ---- */
+        function lex(text) {
+            if (text.startsWith('>'))
+                return [{ t: '>', c: '' }, { t: text.slice(1), c: 'bq' }];
+
+            const m = text.match(/^\[([^\]]+)\]\("([^"]+)"\)$/);
+            if (m) {
+                const url = m[2];
+                const href = url.includes('@') && !url.startsWith('http') ? 'mailto:' + url : url;
+                return [
+                    { t: '[', c: '', href },
+                    { t: m[1], c: 'lt', href },
+                    { t: ']', c: '', href },
+                    { t: '("' + url + '")', c: 'lu', href }
+                ];
+            }
+            return [{ t: text, c: '' }];
+        }
+
+        const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+
+        function span(t, c, start, line, extra = '') {
+            if (!t) return '';
+            return `<span class="${(c + ' ' + extra).trim()}" data-l="${line}" data-s="${start}">${esc(t)}</span>`;
+        }
+
+        function renderLine(text, li) {
+            let html = '', pos = 0;
+            for (const seg of lex(text)) {
+                const a = pos, b = pos + seg.t.length;
+                let inner;
+                if (li === cl && cc >= a && cc < b) {
+                    const k = cc - a;
+                    inner = span(seg.t.slice(0, k), seg.c, a, li) +
+                            span(seg.t[k], seg.c, cc, li, 'cursor') +
+                            span(seg.t.slice(k + 1), seg.c, cc + 1, li);
+                } else inner = span(seg.t, seg.c, a, li);
+                html += seg.href ? `<a href="${seg.href}" target="_blank" rel="noopener">${inner}</a>` : inner;
+                pos = b;
+            }
+            if (li === cl && cc >= text.length)           // cursor at end of line
+                html += span(' ', '', text.length, li, 'cursor');
+            return html;
+        }
+
+        function render() {
+            buffer.innerHTML = lines.map((t, i) =>
+                `<div class="row"><div class="ln">${i + 1}</div><div class="tx">${renderLine(t, i)}</div></div>`
+            ).join('');
+            updateModeline();
+        }
+
+        function updateModeline() {
+            const max = buffer.scrollHeight - buffer.clientHeight;
+            let where = 'All';
+            if (max > 2) {
+                const s = buffer.scrollTop;
+                where = s <= 0 ? 'Top' : s >= max - 2 ? 'Bot' : Math.round(s / max * 100) + '%';
+            }
+            posEl.textContent = where + ' L' + (cl + 1);
+        }
+
+        /* ---- editing ---- */
+        const sink = document.getElementById('sink');
+        const statusEl = document.getElementById('st');
+        const undoStack = [];
+        let blinkTimer;
+
+        function blinkPause() {
+            document.body.classList.add('typing');
+            clearTimeout(blinkTimer);
+            blinkTimer = setTimeout(() => document.body.classList.remove('typing'), 600);
+        }
+
+        function after() {
+            render();
+            const cur = buffer.querySelector('.cursor');
+            if (cur) cur.scrollIntoView({ block: 'nearest' });
+            updateModeline();
+            blinkPause();
+        }
+
+        function snapshot() {
+            undoStack.push({ l: lines.slice(), cl, cc });
+            if (undoStack.length > 200) undoStack.shift();
+            statusEl.textContent = '1\\**-';
+        }
+
+        function undo() {
+            const u = undoStack.pop();
+            if (!u) return;
+            lines.splice(0, lines.length, ...u.l);
+            cl = u.cl; cc = u.cc;
+            if (!undoStack.length) statusEl.textContent = '1\\---';
+        }
+
+        function insertText(text) {
+            snapshot();
+            const parts = text.replace(/\r\n?/g, '\n').split('\n');
+            const head = lines[cl].slice(0, cc), tail = lines[cl].slice(cc);
+            if (parts.length === 1) {
+                lines[cl] = head + parts[0] + tail;
+                cc += parts[0].length;
+            } else {
+                const last = parts[parts.length - 1];
+                lines.splice(cl, 1, head + parts[0], ...parts.slice(1, -1), last + tail);
+                cl += parts.length - 1;
+                cc = last.length;
+            }
+        }
+
+        function backspace() {
+            if (cc > 0) {
+                snapshot();
+                lines[cl] = lines[cl].slice(0, cc - 1) + lines[cl].slice(cc);
+                cc--;
+            } else if (cl > 0) {
+                snapshot();
+                cc = lines[cl - 1].length;
+                lines[cl - 1] += lines[cl];
+                lines.splice(cl, 1);
+                cl--;
+            }
+        }
+
+        function del() {
+            if (cc < lines[cl].length) {
+                snapshot();
+                lines[cl] = lines[cl].slice(0, cc) + lines[cl].slice(cc + 1);
+            } else if (cl < lines.length - 1) {
+                snapshot();
+                lines[cl] += lines[cl + 1];
+                lines.splice(cl + 1, 1);
+            }
+        }
+
+        function killLine() {            // C-k
+            if (cc < lines[cl].length) { snapshot(); lines[cl] = lines[cl].slice(0, cc); }
+            else del();
+        }
+
+        function move(dl, dc) {
+            if (dc) {
+                cc += dc;
+                if (cc < 0 && cl > 0) { cl--; cc = lines[cl].length; }
+                else if (cc > lines[cl].length && cl < lines.length - 1) { cl++; cc = 0; }
+                else cc = Math.max(0, Math.min(cc, lines[cl].length));
+            }
+            if (dl) {
+                cl = Math.max(0, Math.min(cl + dl, lines.length - 1));
+                cc = Math.min(cc, lines[cl].length);
+            }
+        }
+
+        function flush() {
+            const v = sink.value;
+            sink.value = '';
+            if (v) { insertText(v); after(); }
+        }
+        sink.addEventListener('input', e => { if (!e.isComposing) flush(); });
+        sink.addEventListener('compositionend', flush);
+
+        sink.addEventListener('keydown', e => {
+            if (e.isComposing) return;
+            const ctrl = e.ctrlKey && !e.altKey && !e.metaKey;
+            const k = e.key;
+
+            if (ctrl && k === 'Enter') {
+                const m = lines[cl].match(/^\[[^\]]+\]\("([^"]+)"\)$/);
+                if (m) window.open(m[1].includes('@') && !m[1].startsWith('http') ? 'mailto:' + m[1] : m[1], '_blank');
+            }
+            else if (k === 'ArrowDown'  || (ctrl && k === 'n')) move(1, 0);
+            else if (k === 'ArrowUp'    || (ctrl && k === 'p')) move(-1, 0);
+            else if (k === 'ArrowRight' || (ctrl && k === 'f')) move(0, 1);
+            else if (k === 'ArrowLeft'  || (ctrl && k === 'b')) move(0, -1);
+            else if (k === 'Home' || (ctrl && k === 'a')) cc = 0;
+            else if (k === 'End'  || (ctrl && k === 'e')) cc = lines[cl].length;
+            else if (e.altKey && k === '<') { cl = 0; cc = 0; }
+            else if (e.altKey && k === '>') { cl = lines.length - 1; cc = lines[cl].length; }
+            else if (k === 'Backspace' || (ctrl && k === 'h')) backspace();
+            else if (k === 'Delete'    || (ctrl && k === 'd')) del();
+            else if (ctrl && k === 'k') killLine();
+            else if (k === 'Enter') insertText('\n');
+            else if (k === 'Tab') insertText('    ');
+            else if (ctrl && (k === 'z' || k === '/' || k === '_')) undo();
+            else return;                 // printable keys, copy/paste etc. -> default
+            e.preventDefault();
+            after();
+        });
+
+        /* click to place the cursor (links still open normally) */
+        buffer.addEventListener('mousedown', e => {
+            if (e.target.closest('a')) return;
+            let node, off;
+            if (document.caretPositionFromPoint) {
+                const p = document.caretPositionFromPoint(e.clientX, e.clientY);
+                if (p) { node = p.offsetNode; off = p.offset; }
+            } else if (document.caretRangeFromPoint) {
+                const r = document.caretRangeFromPoint(e.clientX, e.clientY);
+                if (r) { node = r.startContainer; off = r.startOffset; }
+            }
+            const el = node && (node.nodeType === 3 ? node.parentElement : node).closest('[data-l]');
+            if (el) { cl = +el.dataset.l; cc = Math.min(+el.dataset.s + off, lines[cl].length); }
+            else {
+                const row = e.target.closest('.row');
+                if (row) { cl = [...buffer.children].indexOf(row); cc = lines[cl].length; }
+            }
+            e.preventDefault();
+            sink.focus();
+            render();
+            blinkPause();
+        });
+
+        sink.addEventListener('focus', () => document.body.classList.remove('blurred'));
+        sink.addEventListener('blur',  () => document.body.classList.add('blurred'));
+
+        buffer.addEventListener('scroll', updateModeline);
+        window.addEventListener('resize', updateModeline);
+
+        render();
+        sink.focus();
+    </script>
 </body>
 
 </html>
